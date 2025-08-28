@@ -3,13 +3,8 @@ pipeline {
 
     stages {
         stage('Build') {
-            agent {
-                docker {
-                    image 'python:3.9'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
             steps {
+                echo 'Building Docker image...'
                 sh 'docker build -t calculator-app .'
             }
         }
@@ -21,6 +16,7 @@ pipeline {
                 }
             }
             steps {
+                echo 'Running tests...'
                 sh 'pip install -r requirements.txt'
                 sh 'pytest tests'
             }
