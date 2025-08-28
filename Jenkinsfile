@@ -29,7 +29,20 @@ pipeline {
                 changeRequest()
             }
             steps {
-                echo 'Push image to ECR with PR tag here'
+                script {
+                    def accountId = "992382545251"
+                    def region = "us-east-1"
+                    def repoName = "yuvalz-calculator-app"
+                    def imageTag = "pr-${env.CHANGE_ID}-${env.BUILD_NUMBER}"
+                    def ecrImage = "${accountId}.dkr.ecr.${region}.amazonaws.com/${repoName}:${imageTag}"
+
+                    sh """
+                      aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${accountId}.dkr.ecr.${region}.amazonaws.com
+                      docker tag calculator-app:latest ${ecrImage}
+                      docker push ${ecrImage}
+                    """
+                    echo "✅ Pushed image to ECR: ${ecrImage}"
+                }
             }
         }
     }
