@@ -20,7 +20,7 @@ pipeline {
                 echo 'Running tests...'
                 sh 'pip install -r requirements.txt'
                 sh 'pip install pytest'
-                sh 'pytest tests'
+                sh 'export PYTHONPATH=$PYTHONPATH:$(pwd) && pytest tests'
             }
         }
 
