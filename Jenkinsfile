@@ -36,14 +36,14 @@ pipeline {
                     def imageTag = "pr-${env.CHANGE_ID}-${env.BUILD_NUMBER}"
                     def ecrImage = "${accountId}.dkr.ecr.${region}.amazonaws.com/${repoName}:${imageTag}"
 
-                    sh """
-                      aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${accountId}.dkr.ecr.${region}.amazonaws.com
-                      docker tag calculator-app:latest ${ecrImage}
-                      docker push ${ecrImage}
-                    """
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                        sh """
+                          aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${accountId}.dkr.ecr.${region}.amazonaws.com
+                          docker tag calculator-app:latest ${ecrImage}
+                          docker push ${ecrImage}
+                        """
+                    }
                     echo "✅ Pushed image to ECR: ${ecrImage}"
                 }
             }
         }
-    }
-}
